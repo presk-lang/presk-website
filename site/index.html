@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presk</title>
+<meta name="description" content="Presk is a language and compiler for neural networks whose programs have an exact mathematical meaning, compiled under a declared error budget.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Presk</h1>
+  <!-- The tagline is the user's choice (presk-project/docs/presk-beyond-neural-networks-2026-09-26.md);
+       this one follows the report's framing. -->
+  <p class="tagline">A language for neural networks with an exact meaning, compiled under a declared error budget.</p>
+  <nav>
+    <a href="#what">What it is</a>
+    <a href="#example">An example</a>
+    <a href="#status">Where it stands</a>
+    <a href="#documents">Documents</a>
+    <a href="#source">Source</a>
+    <a href="#cite">Cite</a>
+  </nav>
+</header>
+
+<main>
+
+<h2 id="what">What it is</h2>
+<p>A Presk program denotes a mathematical function over tensors of real
+numbers. The language has no machine number type: no <code>float32</code>,
+no <code>bfloat16</code>. Shapes, with named and symbolic axes, are part of
+the types and are checked before anything runs; every function carries a
+regularity class that decides whether it may be differentiated; randomness
+is an explicit effect.</p>
+<p>Precision is a compilation choice. The author declares an error budget
+on a result, and the compiler chooses, site by site, the machine types and
+the order of operations that meet it, then checks the choice by measurement
+against an exact reference. A rewrite the optimizer applies changes nothing
+over the reals; an approximation is always declared, and bounded.</p>
+<p>Training and inference are derived from the same program, not written
+twice. The compiler is written in Rust and generates native code.</p>
+
+<h2 id="example">An example</h2>
+<!-- presk-specs/examples/layernorm/layernorm.psk, the LayerNorm module, verbatim (comments shortened).
+     Add the output of `presk check` and `presk solve` from the manual's tutorial when the public branch holds the front-end. -->
+<pre><code>module LayerNorm{D : dim} {
+  param γ : ℝ[D]  init = ones     -- gain
+  param β : ℝ[D]  init = zeros    -- bias
+
+  -- eps is not a numerical guard: the semantics is exact. It is a
+  -- hyperparameter of the model. The stability of sqrt and of the
+  -- division is the compiler's, under the budget.
+  fn apply(x : ℝ[..., model: D], eps : f64 = 1e-5) -> ℝ[..., model: D] =
+    let μ  = mean(axis model, x)
+    let σ2 = mean(axis model, (x - μ)^2)
+    let x̂  = (x - μ) / sqrt(σ2 + real(eps))
+    x̂ * γ + β
+}</code></pre>
+<p class="note">A layer norm over a symbolic model dimension <code>D</code>,
+checked once for every <code>D</code>: the program of the specification's
+examples, which the compiler checks as its test suite.</p>
+
+<h2 id="status">Where it stands</h2>
+<!-- Keep in step with the latest presk-specs/docs/status-*.md; say what fails. -->
+<p>Presk is a research project at Mines Paris – PSL, at the scale of a
+doctoral thesis. The compiler exists, with a reference interpreter that
+computes the exact meaning of a program, a native backend, training and
+serving, an optimizer over exact rewrites, a solver for error budgets, and
+a PyTorch export. It has been tested on statements fixed in advance:</p>
+<ul>
+  <li>A budget on one training step bought a factor of about two over
+  computing everything in double precision, with the error measured against
+  the exact reference. Integer weights hold a measured error. BERT-large
+  runs at the published constants with an exact reference.</li>
+  <li>A static cost model, frozen before the measurements, ranks the
+  fastest arrangements of an attention kernel correctly on more than nine
+  close comparisons in ten on one kind of core, and on about seven in eight
+  on new shapes, short of the target set for it. Used as a filter, it finds
+  an arrangement within 3&nbsp;% of the best for under 2&nbsp;% of the cost
+  of timing every one.</li>
+  <li>Training speed is well behind PyTorch. The GPU has not started.</li>
+</ul>
+
+<h2 id="documents">Documents</h2>
+<!-- Links to fill when the documents are published; a link to an absent file is removed, not promised. -->
+<table>
+  <tr><th>The manual</th><td>what the compiler accepts and does, chapter by chapter (<code>docs.presk-lang.org</code>, when the public branch carries it)</td></tr>
+  <tr><th>The report</th><td>the research program: vision, specification, case study, cost models, positioning, roadmap (PDF, to be placed here)</td></tr>
+  <tr><th>The language reference</th><td>the normative text (PDF, to be placed here)</td></tr>
+</table>
+
+<h2 id="source">Source</h2>
+<p>The compiler is published under the Apache-2.0 license at
+<a href="https://github.com/presk-lang/presk">github.com/presk-lang/presk</a>,
+and the specification, with the example programs that are the compiler's
+test suite, at
+<a href="https://github.com/presk-lang/presk-specs">github.com/presk-lang/presk-specs</a>.
+<!-- Until level 3 of the publication note: --> The public branch holds
+the front-end (the parser, the type checker with its decidable fragment of
+shape arithmetic, and <code>presk check</code>); the rest of the compiler
+follows.</p>
+
+<h2 id="cite">Cite</h2>
+<!-- Replace by the paper's entry on acceptance. -->
+<pre><code>@techreport{presk2026report,
+  author      = {Silber, Georges-Andr{\'e}},
+  title       = {Presk: a research program on the compilation of neural networks under an exact semantics},
+  institution = {Mines Paris -- PSL},
+  year        = {2026}
+}</code></pre>
+
+</main>
+
+<footer>
+  <p>Presk is developed at Mines Paris – PSL. Contact: georges-andre.silber at minesparis.psl.eu.</p>
+</footer>
+
+</body>
+</html>
