@@ -3,8 +3,10 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > Repository: `presk-website` — the static site of `presk-lang.org`,
-> published by GitHub Pages from `presk-lang/presk-lang.github.io`.
-> Created 2026-09-26 from `presk-project`.
+> published by GitHub Pages from `github.com/presk-lang/presk-website`
+> (remote `github`, a mirror); canonical on the GitLab (remote `origin`,
+> `git.sophia.minesparis.psl.eu:presk/presk-website`). Created 2026-09-26
+> from `presk-project`.
 
 ## What this is
 
@@ -34,10 +36,10 @@ crate); this site links to it.
   repository is removed, not left as a promise.
 - PDFs placed under `site/` are copies of built documents of `presk-specs`,
   named with their date; the source of truth stays there.
-- Git: no remote until the user creates the GitHub repository and adds
-  `origin`. The agent never pushes to GitHub. Once the remote exists, a
-  branch and a pull request per change; the user merges. `git status` and
-  `git log --oneline -5` before editing.
+- Git: `origin` is the GitLab and is where work goes, as in the sibling
+  repos: a branch per change, a merge request through `gas-forge`; the
+  user merges. The user pushes `main` to `github`; **the agent never pushes
+  to GitHub**. `git status` and `git log --oneline -5` before editing.
 
 ## Where things are
 

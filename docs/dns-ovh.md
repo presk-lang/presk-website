@@ -34,10 +34,12 @@ addresses; `dig +short docs.presk-lang.org CNAME` answers
    and enter the `TXT` record GitHub gives (`_github-pages-challenge-presk-lang`)
    in the OVH zone. This stops anyone else from claiming subdomains of the
    organization's domain on Pages.
-2. Repository `presk-lang/presk-lang.github.io` → Settings → Pages: Source
+2. Repository `presk-lang/presk-website` → Settings → Pages: Source
    "GitHub Actions"; custom domain `presk-lang.org` (the workflow's
-   `site/CNAME` keeps it); wait for the DNS check, then tick "Enforce
-   HTTPS" once the certificate is issued (minutes to an hour).
+   `site/CNAME` keeps it; since the repository is not named
+   `presk-lang.github.io`, the custom domain is what makes it serve the
+   apex); wait for the DNS check, then tick "Enforce HTTPS" once the
+   certificate is issued (minutes to an hour).
 3. Repository `presk-lang/presk` (when `github_main` is pushed and the
    manual is to be public) → Settings → Pages: custom domain
    `docs.presk-lang.org`, source "GitHub Actions", with a workflow that

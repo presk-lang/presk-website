@@ -1,9 +1,11 @@
 # presk-website
 
 The site served at `presk-lang.org`: a static page in `site/`, published
-by GitHub Pages from `github.com/presk-lang/presk-lang.github.io` (the
-repository name GitHub Pages uses for an organization's apex site) through
-the workflow in `.github/workflows/pages.yml`.
+by GitHub Pages from `github.com/presk-lang/presk-website` through the
+workflow in `.github/workflows/pages.yml`. The canonical repository is on
+the GitLab (`origin`, `git.sophia.minesparis.psl.eu:presk/presk-website`);
+GitHub (remote `github`) is the mirror Pages builds from, pushed by the
+user.
 
 - `site/index.html` — the landing page. No build step, no JavaScript, no
   external fonts or scripts: the page is the file.
@@ -13,10 +15,9 @@ the workflow in `.github/workflows/pages.yml`.
   Pages settings.
 - `CLAUDE.md` — guidance for coding agents.
 
-Prepared 2026-09-26 as a local repository with no remote. To publish: the
-user creates the repository under the `presk-lang` organization, adds
-`origin`, pushes `main`, enables Pages (source: GitHub Actions) with the
-custom domain `presk-lang.org`, and enters the DNS records. The manual at
+Prepared 2026-09-26. To publish: the user pushes `main` to `github`,
+enables Pages on `presk-lang/presk-website` (source: GitHub Actions) with
+the custom domain `presk-lang.org`, and enters the DNS records. The manual at
 `docs.presk-lang.org` is not built here: it is the `presk` repository's own
 Pages site, built from its `presk-manual` crate.
 
