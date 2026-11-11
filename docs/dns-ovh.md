@@ -30,21 +30,24 @@ addresses; `dig +short docs.presk-lang.org CNAME` answers
 
 ## GitHub side (user)
 
-1. Organization settings → Pages → "Verified domains": add `presk-lang.org`
-   and enter the `TXT` record GitHub gives (`_github-pages-challenge-presk-lang`)
-   in the OVH zone. This stops anyone else from claiming subdomains of the
-   organization's domain on Pages.
+1. Organization settings → Pages (the sidebar's "Code, planning, and
+   automation" section; owners only) → "Verified domains", "Add a domain":
+   add `presk-lang.org` and enter the `TXT` record GitHub gives
+   (`_github-pages-challenge-presk-lang`) in the OVH zone. This stops
+   anyone else from claiming subdomains of the organization's domain on
+   Pages.
 2. Repository `presk-lang/presk-website` → Settings → Pages: Source
    "GitHub Actions"; custom domain `presk-lang.org` (the workflow's
    `site/CNAME` keeps it; since the repository is not named
    `presk-lang.github.io`, the custom domain is what makes it serve the
    apex); wait for the DNS check, then tick "Enforce HTTPS" once the
    certificate is issued (minutes to an hour).
-3. Repository `presk-lang/presk` (when `github_main` is pushed and the
-   manual is to be public) → Settings → Pages: custom domain
-   `docs.presk-lang.org`, source "GitHub Actions", with a workflow that
-   runs `cargo doc -p presk-manual --no-deps` and uploads `target/doc` (a
-   redirect `index.html` to `presk_manual/index.html` at the root).
+3. Repository `presk-lang/presk` (once its `main`, the export's
+   `refs/public/main`, is pushed) → Settings → Pages: custom domain
+   `docs.presk-lang.org`, source "GitHub Actions". The repository's
+   workflow `.github/workflows/pages.yml` runs `cargo doc -p presk-manual
+   --no-deps` and uploads `target/doc`, with a redirect `index.html` to
+   `presk_manual/index.html` at the root, on every push to `main`.
    "Enforce HTTPS" likewise.
 
 ## What is not done from the agent's side
