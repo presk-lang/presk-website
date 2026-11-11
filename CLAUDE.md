@@ -34,8 +34,10 @@ crate); this site links to it.
 - Links to `github.com/presk-lang/...` name repositories that exist and are
   public at the time of the change; a link to a private or absent
   repository is removed, not left as a promise.
-- PDFs placed under `site/` are copies of built documents of `presk-specs`,
-  named with their date; the source of truth stays there.
+- No PDF on the site for now (the user, 2026-11-11: the report and the
+  reference were removed). If PDFs come back, they are copies of built
+  documents of `presk-specs`, named with their date; the source of truth
+  stays there.
 - Git: `origin` is the GitLab and is where work goes, as in the sibling
   repos: a branch per change, a merge request through `gas-forge`; the
   user merges. The user pushes `main` to `github`; **the agent never pushes

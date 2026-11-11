@@ -11,9 +11,6 @@ user.
   external fonts or scripts: the page is the file.
 - `site/CNAME` — the custom domain, read by GitHub Pages.
 - `site/style.css` — the page's style.
-- `site/presk-report-<date>.pdf`, `site/presk-reference-<date>.pdf` — the
-  report and the language reference, copies of `presk-specs`' built
-  documents named with their date (the source of truth stays there).
 - `docs/dns-ovh.md` — the records to enter in the OVH DNS zone, and the
   Pages settings.
 - `CLAUDE.md` — guidance for coding agents.
