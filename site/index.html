@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Presk</title>
-<meta name="description" content="Presk is a language and compiler for neural networks whose programs have an exact mathematical meaning, compiled under a declared error budget.">
+<meta name="description" content="Presk is a language and compiler for neural networks whose programs have an exact mathematical meaning and are compiled under a declared error budget.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -29,16 +29,16 @@
 
 <h2 id="what">What it is</h2>
 <p>A Presk program denotes a mathematical function over tensors of real
-numbers. The language has no machine number type for its tensors: no <code>float32</code>,
+numbers. The language has no machine number type for tensors: no <code>float32</code>,
 no <code>bfloat16</code>. Shapes, with named and symbolic axes, are part of
 the types and are checked before anything runs; every function carries a
-regularity class that decides whether it may be differentiated; randomness
+regularity class that determines whether it may be differentiated; randomness
 is an explicit effect.</p>
 <p>Precision is a compilation choice. The author declares an error budget
 on a result, and the compiler chooses, site by site, the machine types and
-the order of operations that meet it, then checks the choice by measurement
-against an exact reference. A rewrite the optimizer applies changes nothing
-over the reals; an approximation is always declared, and bounded.</p>
+the order of operations that meet it, then checks that choice by measurement
+against an exact reference. Every rewrite the optimizer applies is exact
+over the reals; any approximation is declared and bounded.</p>
 <p>Training and inference are derived from the same program, not written
 twice. The compiler is written in Rust and generates native code.</p>
 
@@ -57,9 +57,10 @@ twice. The compiler is written in Rust and generates native code.</p>
     let x̂  = (x - μ) / sqrt(σ2 + real(eps))
     x̂ * γ + β
 }</code></pre>
-<p class="note">A layer norm over a symbolic model dimension <code>D</code>,
-checked once for every <code>D</code>: one of the programs of the
-specification's examples, which the compiler checks as its test suite.</p>
+<p class="note">Layer normalization over a symbolic model dimension
+<code>D</code>, checked once for every value of <code>D</code>. It is one of
+the specification's example programs, which the compiler uses as its test
+suite.</p>
 <!-- The output of `presk check tests/examples/layernorm/layernorm.psk --summary` at 0.17.1 (the file also
      holds an RMSNorm module), verbatim, 2026-11-09. -->
 <pre><code>$ presk check layernorm.psk --summary
@@ -74,90 +75,97 @@ LayerNorm.apply : [θ C∞, x C∞, eps C∞] uses none
 RMSNorm.apply : [θ C∞, x C∞, eps C∞] uses none
 LayerNorm.init : [key C∞] uses Rand
 RMSNorm.init : [key C∞] uses Rand</code></pre>
-<p class="note">What the type checker says of it: the shape of every value,
-the regularity of each function in each of its arguments, and the effects it
-uses. A budget comes next (<code>presk calibrate</code>, <code>presk
-solve</code>); the manual's tutorial walks through it.</p>
+<p class="note">What the type checker reports: the shape of every value,
+the regularity of each function in each of its arguments, and the effects
+each function uses. Declaring a budget comes next (<code>presk
+calibrate</code>, <code>presk solve</code>); the manual's tutorial walks
+through it.</p>
 
 <h2 id="status">Where it stands</h2>
 <!-- In step with presk-specs/docs/status-2026-11-08-0.17.1.md (version 0.17.1, tagged 2026-11-08) and the
      compiler's CHANGELOG; what fails is said to fail. Each number's record is in the comment beside it. -->
-<p>Presk is a research project at Mines Paris – PSL, funded by the french research program PEPR CAMELIA (composants matériels et logiciels pour l'IA).
-    The <a href="https://github.com/presk-lang/presk">compiler</a> exists
-with a reference interpreter that computes the exact meaning of a program,
-a native backend with its own code generator and a second one through
-<code>clang</code>, training and serving, an optimizer over exact rewrites,
-a solver for error budgets, exports to PyTorch and to C, and one
-compilation drawn as a document with every decision and its reason. It has
-been tested on statements fixed in advance, and the ones that fail are
-recorded as failing:</p>
+<!-- The funding sentence is the user's (2026-11-12). -->
+<p>Presk is a research project at Mines Paris – PSL, funded by the French
+research programme PEPR CAMELIA (<i lang="fr">composants matériels et
+logiciels pour l'IA</i>: hardware and software components for AI). The
+<a href="https://github.com/presk-lang/presk">compiler</a> has a reference
+interpreter that computes the exact meaning of a program, a native backend
+with its own code generator and a second backend through
+<code>clang</code>, training and serving, an optimizer that applies only
+exact rewrites, a solver for error budgets, exports to PyTorch and to C,
+and a view of a compilation as a document that gives every decision and
+its reason. It has been tested against statements fixed in advance, and
+those that fail are reported as failing:</p>
 <ul>
   <!-- D127 (five processes): the step under the solved update budget 13.91 s against 24.35 all-f64, all-f32 1.76x;
        H6 fails (a budget on the loss buys no time); H7 holds. -->
-  <li>A budget declared on a training step's update buys a step 1.75 times
-  faster than computing everything in double precision, at the scale of a
-  course's GPT, level with single precision, the error measured against the
-  exact reference. A budget on the loss alone buys no time: it leaves the
-  gradient and the optimizer, most of a step, out of reach.</li>
+  <li>On a course-sized GPT, a budget declared on the update of a
+  training step makes the step 1.75 times faster than computing
+  everything in double precision, matching single precision, with the
+  error measured against the exact reference. A budget on the loss alone
+  buys no time: it leaves the gradient and the optimizer, which make up
+  most of a step, out of reach.</li>
   <!-- D181 (0.17.0 step 8, D127's protocol): Cranelift with level 2 0.994x the C program's step, the LLVM backend
        0.871x; D166/D153: the C step 0.93x PyTorch eager's, 1.7x compiled PyTorch's (2.0x like for like). -->
-  <li>The compiler's own code generator is at the C compiler on its
-  kernels — 0.99 times the exported C program's training step, 0.87 with
-  the backend through <code>clang</code> — and the C program takes 0.93
-  times PyTorch eager's step and 1.7 times compiled PyTorch's, every bit
-  of its arithmetic the same as the native backend's.</li>
+  <li>On its own kernels, the compiler's code generator is on par with the
+  C compiler: its training step takes 0.99 times as long as the exported C
+  program's, and 0.87 times as long with the backend through
+  <code>clang</code>. The C program's step takes 0.93 times as long as
+  PyTorch's in eager mode and 1.7 times as long as compiled PyTorch's,
+  with every bit of its arithmetic the same as the native backend's.</li>
   <!-- D72, D73 (0.8.0): F2 92.7 % and 91.7 % on the A725 cores, F1 85.4–88.8 % on new shapes; within 1.05x of the
        best; under 2 % of the cost (the manual's experiments chapter, §8). -->
-  <li>A static cost model of the loop nests, frozen before the
-  measurements, ranks the fastest arrangements of an attention kernel as
-  measurement does on 91.7 to 92.7 % of close comparisons on another kind
-  of core, and on 85 to 89 % on new shapes, short of the 90 % set for it.
-  Used as a filter, it finds an arrangement within 1.05 times the best for
-  under 2 % of the cost of timing every one.</li>
+  <li>A static cost model of loop nests, frozen before the measurements,
+  orders the fastest arrangements of an attention kernel as measurement
+  does in 91.7 to 92.7&nbsp;% of close comparisons on another kind of core,
+  but in only 85 to 89&nbsp;% on new shapes, short of the 90&nbsp;% target
+  set for it. Used as a filter, it finds an arrangement within 1.05 times
+  the best at under 2&nbsp;% of the cost of timing them all.</li>
   <!-- D186–D190 (0.17.1, status-2026-11-08-0.17.1.md §3): eps*(1 %) = 3.81e-3; the eighth solve B: bf16 weights,
        f32 arithmetic, twelve stored values bf16, 0 of 1 024 held-out decisions changed, 7.7e-4 under 3.81e-3;
        llama.cpp BF16 0.257 and 0 flips (certifiable at delta = 0.38), transformers bfloat16 0.566 and 32 flips;
        Q8_0 1.31 GB and 28 flips; RW7 fails at every delta. -->
-  <li>Llama 3.2 1B, on its published weights, was solved whole under a
-  budget read off a quality target: at most one of the exact model's
-  decisions in a hundred may change. The solver returned the checkpoint's
-  own 16-bit weights with 32-bit arithmetic and a dozen stored values in
-  16-bit; on 1 024 held-out decisions it changes none, and its error is
-  under the budget. llama.cpp's 16-bit run changes none either, and
-  <code>transformers</code>' 16-bit run changes 32, but neither stays
-  within the budget: the guarantee bounds the worst error anywhere, not
-  only where a decision is close. For the same reason the compiler does
-  not beat the 8-bit recipes on weight bytes — their errors are 37 to 43
-  times the budget while they change 2.7 % of the decisions —, which was
-  stated as a hypothesis and fails.</li>
-  <li>The GPU has not started, and serving recomputes the whole context at
-  every word.</li>
+  <li>The solver was run on the whole of Llama 3.2 1B, with its published
+  weights, under a budget derived from a quality target: at most one in a
+  hundred of the exact model's decisions may change. It returned the
+  checkpoint's own 16-bit weights, with 32-bit arithmetic and a dozen
+  stored values in 16 bits; on 1&nbsp;024 held-out decisions the result
+  changes none, and its error is under the budget. llama.cpp's 16-bit
+  run changes none either, and <code>transformers</code>' 16-bit run
+  changes 32, but neither stays within the budget: the guarantee bounds
+  the worst error anywhere, not only where a decision is close. For the
+  same reason, the hypothesis stated in advance that the compiler would
+  beat the 8-bit recipes on weight bytes fails: their errors are 37 to
+  43 times the budget, while they change 2.7&nbsp;% of the decisions.</li>
+  <li>Work on GPUs has not started, and serving recomputes the whole
+  context for every new word.</li>
 </ul>
 
 <h2 id="documents">Documents</h2>
 <!-- No PDF on the site for now (the user, 2026-11-11): the report and the
      language reference stay in presk-specs. -->
 <table>
-  <tr><th>The manual</th><td><a href="https://docs.presk-lang.org">docs.presk-lang.org</a>: what the compiler accepts and does, chapter by chapter; its tutorial is the place to start</td></tr>
+  <tr><th>The manual</th><td><a href="https://docs.presk-lang.org">docs.presk-lang.org</a>: what the compiler accepts and what it does, chapter by chapter; start with its tutorial</td></tr>
 </table>
 
 <h2 id="install">Install</h2>
 <!-- The crate `presk` on crates.io, published from the public repository at 0.17.1 (presk's CONTRIBUTING.md). -->
 <pre><code>cargo install presk
 presk --help</code></pre>
-<p class="note">A Rust toolchain (1.85 or later), <code>m4</code> and a C
-compiler: the reference interpreter uses GMP and MPFR, built once from their
-sources. The C export's programs need only a C11 compiler. PyTorch is not
-needed, except to run the conformance tests the export generates.</p>
+<p class="note">Building it needs a Rust toolchain (1.85 or later),
+<code>m4</code> and a C compiler: the reference interpreter uses GMP and
+MPFR, which are built once from source. Programs exported to C need only a
+C11 compiler. PyTorch is needed only to run the conformance tests that the
+PyTorch export generates.</p>
 
 <h2 id="source">Source</h2>
 <p>The compiler is published under the Apache License 2.0 at
 <a href="https://github.com/presk-lang/presk">github.com/presk-lang/presk</a>:
-the whole compiler at version 0.17.1, one commit per version since 0.1.0,
-with the example programs of the specification as its test suite
-(<code>tests/examples</code>), the programs of the tutorial, the
-transcriptions of BERT-large and Llama, and the scripts behind every
-measurement. The specification's own repository follows.</p>
+the whole compiler at version 0.17.1, with one commit per version since
+0.1.0. It includes the specification's example programs, which serve as
+its test suite (<code>tests/examples</code>), the tutorial's programs,
+BERT-large and Llama written in Presk, and the scripts behind every
+measurement. The specification's own repository will follow.</p>
 
 <h2 id="cite">Cite</h2>
 <!-- From presk's CITATION.cff. -->
