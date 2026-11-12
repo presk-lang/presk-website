@@ -29,7 +29,7 @@
 
 <h2 id="what">What it is</h2>
 <p>A Presk program denotes a mathematical function over tensors of real
-numbers. The language has no machine number type: no <code>float32</code>,
+numbers. The language has no machine number type for its tensors: no <code>float32</code>,
 no <code>bfloat16</code>. Shapes, with named and symbolic axes, are part of
 the types and are checked before anything runs; every function carries a
 regularity class that decides whether it may be differentiated; randomness
@@ -82,8 +82,8 @@ solve</code>); the manual's tutorial walks through it.</p>
 <h2 id="status">Where it stands</h2>
 <!-- In step with presk-specs/docs/status-2026-11-08-0.17.1.md (version 0.17.1, tagged 2026-11-08) and the
      compiler's CHANGELOG; what fails is said to fail. Each number's record is in the comment beside it. -->
-<p>Presk is a research project at Mines Paris – PSL, at the scale of a
-doctoral thesis. The compiler exists — version 0.17.1, 8 November 2026 —
+<p>Presk is a research project at Mines Paris – PSL, funded by the french research program PEPR CAMELIA (composants matériels et logiciels pour l'IA).
+    The <a href="https://github.com/presk-lang/presk">compiler</a> exists
 with a reference interpreter that computes the exact meaning of a program,
 a native backend with its own code generator and a second one through
 <code>clang</code>, training and serving, an optimizer over exact rewrites,
