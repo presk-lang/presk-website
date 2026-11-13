@@ -9,6 +9,10 @@ user.
 
 - `site/index.html` — the landing page. No build step, no JavaScript, no
   external fonts or scripts: the page is the file.
+- `site/gpt/index.html` — the pipeline view of a small GPT, a document the
+  compiler wrote (`presk explain --format html` at 0.17.1), copied byte for
+  byte on 2026-11-13: one file with its own scripts and fonts, which loads
+  nothing else. The landing page's section "A whole network" links to it.
 - `site/CNAME` — the custom domain, read by GitHub Pages.
 - `site/style.css` — the page's style.
 - `docs/dns-ovh.md` — the records to enter in the OVH DNS zone, and the

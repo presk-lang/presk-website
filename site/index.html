@@ -17,6 +17,7 @@
   <nav>
     <a href="#what">What it is</a>
     <a href="#example">An example</a>
+    <a href="#network">A whole network</a>
     <a href="#status">Where it stands</a>
     <a href="#documents">Documents</a>
     <a href="#install">Install</a>
@@ -80,6 +81,32 @@ the regularity of each function in each of its arguments, and the effects
 each function uses. Declaring a budget comes next (<code>presk
 calibrate</code>, <code>presk solve</code>); the manual's tutorial walks
 through it.</p>
+
+<h2 id="network">A whole network</h2>
+<!-- gpt/index.html is the page `presk explain --format html` wrote at 0.17.1 for the entry `logits` of
+     experiments/margins.psk, which imports the GPT of corpus/nlp/05_gpt.psk (D = 64, H = 2, L = 2; B = 2,
+     T = 256), on trained weights, under the budget 4.67e-4, planned under the profile
+     crates/presk-explain/tests/data/x925-frozen.json, for the native and C targets; copied byte for byte on
+     2026-11-13 (sha256 7b1b57fc709e724e469037e92019da94ab9583911baa949d16ff02b58f0a37cc). The numbers below are
+     those of its sections 0 and 6.3; the 127 lines are its section 1's listing of 05_gpt.psk. -->
+<p><a href="gpt/">The pipeline view of a small GPT</a> is the document the
+compiler writes about one compilation (<code>presk explain</code>),
+published here as version 0.17.1 wrote it. The program is a GPT in 127
+lines of Presk, with two blocks and a model dimension of 64, on trained
+weights. What is compiled is its logits, under an error budget of
+4.67·10<sup>−4</sup> relative to the output.</p>
+<p>The page follows the program through every stage, from the source to
+the kernels and the exported C program, and gives every decision with its
+reason. The solver puts 19 of the 25 values the program stores and 9 of
+its 21 parameters in single precision, and leaves the others in double
+precision; the error measured against the exact reference is
+2.2·10<sup>−6</sup>, for a budget of 2.4·10<sup>−3</sup> in absolute terms.
+A second tab draws the network as boxes and arrows, read from the same
+program.</p>
+<p class="note">The page is one file of 1.5&nbsp;MB that carries its own
+scripts and fonts and loads nothing else. The files it names beside it
+(the listings, the C program) are not published here; the same command
+writes them.</p>
 
 <h2 id="status">Where it stands</h2>
 <!-- In step with presk-specs/docs/status-2026-11-08-0.17.1.md (version 0.17.1, tagged 2026-11-08) and the
@@ -168,9 +195,9 @@ BERT-large and Llama written in Presk, and the scripts behind every
 measurement. The specification's own repository will follow.</p>
 
 <h2 id="cite">Cite</h2>
-<!-- From presk's CITATION.cff. -->
+<!-- From presk's CITATION.cff; the author is the institution (2026-11-13). -->
 <pre><code>@software{presk2026,
-  author  = {Silber, Georges-Andr{\'e}},
+  author  = {{Centre de recherche en informatique, Mines Paris, PSL}},
   title   = {Presk: a compiler for neural networks with exact real semantics},
   version = {0.17.1},
   year    = {2026},
