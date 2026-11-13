@@ -10,7 +10,8 @@ user.
 - `site/index.html` — the landing page. No build step, no JavaScript, no
   external fonts or scripts: the page is the file.
 - `site/gpt/index.html` — the pipeline view of a small GPT, a document the
-  compiler wrote (`presk explain --format html` at 0.17.1), copied byte for
+  compiler wrote (`presk explain --format html` at 0.17.1, on a copy of the
+  program whose header comment is one sentence shorter), copied byte for
   byte on 2026-11-13: one file with its own scripts and fonts, which loads
   nothing else. The landing page's section "A whole network" links to it.
 - `site/CNAME` — the custom domain, read by GitHub Pages.
@@ -29,6 +30,6 @@ user pushes `main` to `github`, enables Pages on `presk-lang/presk-website`
 manual at `docs.presk-lang.org` is not built here: it is the `presk`
 repository's own Pages site, built from its `presk-manual` crate.
 
-The context, and what may and may not be public while the paper is under
-review, is in `presk-project/docs/publication-2026-09-25.md`, addendum of
-2026-09-26, and `publication-2026-11-09.md` §1.
+The decisions on what is published, and in what order, are in
+`presk-project/docs/publication-2026-09-25.md`, addendum of 2026-09-26, and
+`publication-2026-11-09.md` §1.

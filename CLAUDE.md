@@ -24,10 +24,14 @@ the page the talks' screenshots were taken from), copied byte for byte (the
 user, 2026-11-13). It is one self-contained file (its scripts, KaTeX and
 fonts inline, no request to another host). Never edit it. To replace it,
 run the compiler again (`presk-project/docs/pipeline-view-local.sh` with
-`TAG=<version>` writes `out/explain/logits/explain.html`), check the file
-for local paths and names before copying it, and bring the numbers of the
-landing page's section "A whole network" and the checksum in its comment to
-the new file. The files the page names beside it (`listings/`, `artifacts/`)
+`TAG=<version>` writes `out/explain/logits/explain.html`), read the file
+for local paths, names and anything the rules below keep off the site
+before copying it, and bring the numbers of the landing page's section "A
+whole network" and the checksum in its comment to the new file. The page
+lists the program and its comments: when a comment must not be published,
+the page is written again from a copy of the program with that comment
+changed (as on 2026-11-13, one sentence of the header of
+`experiments/margins.psk`), never by editing the page. The files the page names beside it (`listings/`, `artifacts/`)
 are not published: the exported C program's README and its conformance
 script print the absolute path of the directory they were written in.
 
@@ -42,9 +46,12 @@ script print the absolute path of the directory they were written in.
 - **Nothing from `presk-project`** (transcripts, chats, archives) and
   nothing that the publication note keeps private
   (`presk-project/docs/publication-2026-09-25.md`, addendum 2026-09-26).
-- **While a paper is under double-blind review**, the site may exist and
-  change, but nothing is announced from it and the paper is not mentioned
-  until notification; the paper never links the site.
+- **The site says what the compiler is and does, and nothing else**: it
+  announces nothing and cites no document but the manual. What may be said
+  in public, and when, is decided in `presk-project` (its `CLAUDE.md`).
+- **This repository is public on its GitHub mirror**: this file, the
+  README, the comments in the pages' source and every commit message are
+  read as public text and follow the same rules as the pages.
 - Links to `github.com/presk-lang/...` name repositories that exist and are
   public at the time of the change; a link to a private or absent
   repository is removed, not left as a promise.
