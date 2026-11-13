@@ -2,7 +2,7 @@
   --ink: #1d1d1b;
   --muted: #5b5b57;
   --rule: #d9d6cf;
-  --paper: #fbfaf7;
+  --bg: #fbfaf7;
   --accent: #23508f;
   --code: #f0eee8;
 }
@@ -11,7 +11,7 @@
     --ink: #e8e6e0;
     --muted: #a9a69e;
     --rule: #3a3a37;
-    --paper: #161614;
+    --bg: #161614;
     --accent: #8fb4ec;
     --code: #232321;
   }
@@ -20,7 +20,7 @@
 html { font-size: 17px; }
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
   line-height: 1.5;
