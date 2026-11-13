@@ -44,7 +44,8 @@ over the reals; any approximation is declared and bounded.</p>
 twice. The compiler is written in Rust and generates native code.</p>
 
 <h2 id="example">An example</h2>
-<!-- presk-specs/examples/layernorm/layernorm.psk, the LayerNorm module, verbatim (comments shortened). -->
+<!-- presk's examples/spec/layernorm/layernorm.psk at v0.17.2 (the specification's programs moved there, D198), the
+     LayerNorm module, verbatim (comments shortened). -->
 <pre><code>module LayerNorm{D : dim} {
   param γ : ℝ[D]  init = ones     -- gain
   param β : ℝ[D]  init = zeros    -- bias
@@ -62,8 +63,8 @@ twice. The compiler is written in Rust and generates native code.</p>
 <code>D</code>, checked once for every value of <code>D</code>. It is one of
 the specification's example programs, which the compiler uses as its test
 suite.</p>
-<!-- The output of `presk check tests/examples/layernorm/layernorm.psk --summary` at 0.17.1 (the file also
-     holds an RMSNorm module), verbatim, 2026-11-09. -->
+<!-- The output of `presk check layernorm.psk --summary` in examples/spec/layernorm/ at 0.17.2 (the file also
+     holds an RMSNorm module), verbatim, 2026-11-13; the same as at 0.17.1. -->
 <pre><code>$ presk check layernorm.psk --summary
 layernorm.psk LayerNorm.apply : ℝ[..., model: D]
     let μ : ℝ[...]
@@ -110,7 +111,7 @@ scripts and fonts and loads nothing else. The files it names beside it
 writes them.</p>
 
 <h2 id="status">Where it stands</h2>
-<!-- In step with presk-specs/docs/status-2026-11-08-0.17.1.md (version 0.17.1, tagged 2026-11-08) and the
+<!-- In step with presk-specs/docs/status-2026-11-12-0.17.2.md (version 0.17.2, tagged 2026-11-13) and the
      compiler's CHANGELOG; what fails is said to fail. Each number's record is in the comment beside it. -->
 <!-- The funding sentence is the user's (2026-11-12). -->
 <p>Presk is a research project at Mines Paris – PSL, funded by the French
@@ -164,7 +165,13 @@ those that fail are reported as failing:</p>
   the worst error anywhere, not only where a decision is close. For the
   same reason, the hypothesis stated in advance that the compiler would
   beat the 8-bit recipes on weight bytes fails: their errors are 37 to
-  43 times the budget, while they change 2.7&nbsp;% of the decisions.</li>
+  43 times the budget, while they change 2.7&nbsp;% of the decisions.
+  <!-- D201 (0.17.2, SR5a; status-2026-11-12-0.17.2.md §5): 32 tokens served on one X925 core, the median of
+       three processes: all-f32 763.7 s, the eighth solve B 543.6 s (0.712); compiling the 32 lengths 0.30 to
+       0.39 s of 423 to 773 s; B's computing alone 0.686 of all-f32's. -->
+  Generating 32 words on one core with the solver's result takes 0.71
+  times as long as with every weight and value in 32 bits; compiling takes
+  under a thousandth of that time, so the gain is in the computing itself.</li>
   <li>Work on GPUs has not started, and serving recomputes the whole
   context for every new word.</li>
 </ul>
@@ -177,7 +184,7 @@ those that fail are reported as failing:</p>
 </table>
 
 <h2 id="install">Install</h2>
-<!-- The crate `presk` on crates.io, published from the public repository at 0.17.1 (presk's CONTRIBUTING.md). -->
+<!-- The crate `presk` on crates.io, published from the public repository at 0.17.2 (presk's CONTRIBUTING.md). -->
 <pre><code>cargo install presk
 presk --help</code></pre>
 <p class="note">Building it needs a Rust toolchain (1.85 or later),
@@ -189,18 +196,19 @@ PyTorch export generates.</p>
 <h2 id="source">Source</h2>
 <p>The compiler is published under the Apache License 2.0 at
 <a href="https://github.com/presk-lang/presk">github.com/presk-lang/presk</a>:
-the whole compiler at version 0.17.1, with one commit per version since
-0.1.0. It includes the specification's example programs, which serve as
-its test suite (<code>tests/examples</code>), the tutorial's programs,
-BERT-large and Llama written in Presk, and the scripts behind every
-measurement. The specification's own repository will follow.</p>
+the whole compiler at version 0.17.2, with one commit per version since
+0.1.0. Every program written in Presk is in its <code>examples/</code>:
+the specification's example programs, which serve as its test suite, the
+tutorial's programs, BERT-large and Llama. The scripts behind every
+measurement are in <code>experiments/</code>. The specification's own
+repository will follow.</p>
 
 <h2 id="cite">Cite</h2>
 <!-- From presk's CITATION.cff; the author is the institution (2026-11-13). -->
 <pre><code>@software{presk2026,
   author  = {{Centre de recherche en informatique, Mines Paris, PSL}},
   title   = {Presk: a compiler for neural networks with exact real semantics},
-  version = {0.17.1},
+  version = {0.17.2},
   year    = {2026},
   url     = {https://github.com/presk-lang/presk},
   license = {Apache-2.0}
