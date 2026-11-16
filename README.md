@@ -22,7 +22,8 @@ user.
 
 Prepared 2026-09-26; the content brought to compiler version 0.17.1 on
 2026-11-09 (the plan: `presk-project/docs/publication-2026-11-09.md`), then
-to 0.17.2 on 2026-11-13 (the pipeline view stays the one 0.17.1 wrote). To
+to 0.17.2 on 2026-11-13 and to 0.18.0 on 2026-11-16 (the pipeline view stays
+the one 0.17.1 wrote). To
 publish, in this order: the DNS records of `docs/dns-ovh.md`; the compiler's
 public repository and its crate (`github.com/presk-lang/presk`, `cargo
 install presk`), which the page links to and must exist first; then the

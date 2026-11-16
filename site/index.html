@@ -44,8 +44,8 @@ over the reals; any approximation is declared and bounded.</p>
 twice. The compiler is written in Rust and generates native code.</p>
 
 <h2 id="example">An example</h2>
-<!-- presk's examples/spec/layernorm/layernorm.psk at v0.17.2 (the specification's programs moved there, D198), the
-     LayerNorm module, verbatim (comments shortened). -->
+<!-- presk's examples/spec/layernorm/layernorm.psk at v0.18.0, unchanged since v0.17.2 (the specification's programs
+     moved there, D198), the LayerNorm module, verbatim (comments shortened). -->
 <pre><code>module LayerNorm{D : dim} {
   param γ : ℝ[D]  init = ones     -- gain
   param β : ℝ[D]  init = zeros    -- bias
@@ -63,8 +63,8 @@ twice. The compiler is written in Rust and generates native code.</p>
 <code>D</code>, checked once for every value of <code>D</code>. It is one of
 the specification's example programs, which the compiler uses as its test
 suite.</p>
-<!-- The output of `presk check layernorm.psk --summary` in examples/spec/layernorm/ at 0.17.2 (the file also
-     holds an RMSNorm module), verbatim, 2026-11-13; the same as at 0.17.1. -->
+<!-- The output of `presk check layernorm.psk --summary` in examples/spec/layernorm/ at 0.18.0 (the file also
+     holds an RMSNorm module), verbatim, 2026-11-16; the same as at 0.17.1 and 0.17.2. -->
 <pre><code>$ presk check layernorm.psk --summary
 layernorm.psk LayerNorm.apply : ℝ[..., model: D]
     let μ : ℝ[...]
@@ -111,7 +111,7 @@ scripts and fonts and loads nothing else. The files it names beside it
 writes them.</p>
 
 <h2 id="status">Where it stands</h2>
-<!-- In step with presk-specs/docs/status-2026-11-12-0.17.2.md (version 0.17.2, tagged 2026-11-13) and the
+<!-- In step with presk-specs/docs/status-2026-11-14-0.18.0.md (version 0.18.0, tagged 2026-11-16) and the
      compiler's CHANGELOG; what fails is said to fail. Each number's record is in the comment beside it. -->
 <!-- The funding sentence is the user's (2026-11-12). -->
 <p>Presk is a research project at Mines Paris – PSL, funded by the French
@@ -121,9 +121,10 @@ logiciels pour l'IA</i>: hardware and software components for AI). The
 interpreter that computes the exact meaning of a program, a native backend
 with its own code generator and a second backend through
 <code>clang</code>, training and serving, an optimizer that applies only
-exact rewrites, a solver for error budgets, exports to PyTorch and to C,
-and a view of a compilation as a document that gives every decision and
-its reason. It has been tested against statements fixed in advance, and
+exact rewrites, a solver for error budgets, an emulator that computes in
+any number format a machine may have, bit for bit, exports to PyTorch and
+to C, and a view of a compilation as a document that gives every decision
+and its reason. It has been tested against statements fixed in advance, and
 those that fail are reported as failing:</p>
 <ul>
   <!-- D127 (five processes): the step under the solved update budget 13.91 s against 24.35 all-f64, all-f32 1.76x;
@@ -172,6 +173,28 @@ those that fail are reported as failing:</p>
   Generating 32 words on one core with the solver's result takes 0.71
   times as long as with every weight and value in 32 bits; compiling takes
   under a thousandth of that time, so the gain is in the computing itself.</li>
+  <!-- D203–D209 (0.18.0; status-2026-11-14-0.18.0.md §3 and §5): MT2, 100 tiles of each of the accelerator's
+       simulator's fourteen modes, 1 356 800 values, none differs (the first run's 1 621 NaNs differed in sign:
+       the format's default NaN is now one of its parameters); MT5, the course GPT's logits at D = 64 in the
+       accelerator's types inside none of eps*(1e-1) = 4.735e-2, eps*(1e-2), eps*(1e-3): gap 0.677 on the 461
+       held-out windows (14 times eps*(1e-1)), 3 657 of 118 016 decisions changed, 3 652 with 32-bit or exact
+       sums; MT6, binary16 and e8m15 on the menu at V6's budget: 3.42e6 bytes stored against D170's 3.83e6
+       (10.7 % fewer), no decision changed; the native, LLVM and C backends refuse the new formats (E7005). -->
+  <li>Since version 0.18.0 a number format is described by its
+  parameters, so the compiler can compute in an accelerator's own
+  formats: 8-bit floating-point numbers whose products are summed in 16
+  bits, 8-bit integers with a scale. Its emulator reproduces such a
+  machine's arithmetic bit for bit: of 1&nbsp;356&nbsp;800 results of an
+  accelerator's simulator, in its fourteen ways of computing, none
+  differs. On the course-sized GPT, though, no choice in that
+  accelerator's formats stays within the budget that allows a tenth of the
+  model's decisions to change: the error is about fourteen times that
+  budget, and 3.1&nbsp;% of the decisions change on held-out text. The
+  8-bit inputs to the matrix products are the cause, not the 16-bit sums.
+  On an ordinary processor, with 16- and 24-bit floating-point numbers
+  added to the solver's choices, its result for the same model stores
+  10.7&nbsp;% fewer bytes than before and changes no decision. The fast
+  backends do not compute in the new formats yet.</li>
   <li>Work on GPUs has not started, and serving recomputes the whole
   context for every new word.</li>
 </ul>
@@ -184,7 +207,7 @@ those that fail are reported as failing:</p>
 </table>
 
 <h2 id="install">Install</h2>
-<!-- The crate `presk` on crates.io, published from the public repository at 0.17.2 (presk's CONTRIBUTING.md). -->
+<!-- The crate `presk` on crates.io, published from the public repository at 0.18.0 (presk's CONTRIBUTING.md). -->
 <pre><code>cargo install presk
 presk --help</code></pre>
 <p class="note">Building it needs a Rust toolchain (1.85 or later),
@@ -196,7 +219,7 @@ PyTorch export generates.</p>
 <h2 id="source">Source</h2>
 <p>The compiler is published under the Apache License 2.0 at
 <a href="https://github.com/presk-lang/presk">github.com/presk-lang/presk</a>:
-the whole compiler at version 0.17.2, with one commit per version since
+the whole compiler at version 0.18.0, with one commit per version since
 0.1.0. Every program written in Presk is in its <code>examples/</code>:
 the specification's example programs, which serve as its test suite, the
 tutorial's programs, BERT-large and Llama. The scripts behind every
@@ -208,7 +231,7 @@ repository will follow.</p>
 <pre><code>@software{presk2026,
   author  = {{Centre de recherche en informatique, Mines Paris, PSL}},
   title   = {Presk: a compiler for neural networks with exact real semantics},
-  version = {0.17.2},
+  version = {0.18.0},
   year    = {2026},
   url     = {https://github.com/presk-lang/presk},
   license = {Apache-2.0}
