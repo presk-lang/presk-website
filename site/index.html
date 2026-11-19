@@ -44,7 +44,7 @@ over the reals; any approximation is declared and bounded.</p>
 twice. The compiler is written in Rust and generates native code.</p>
 
 <h2 id="example">An example</h2>
-<!-- presk's examples/spec/layernorm/layernorm.psk at v0.18.0, unchanged since v0.17.2 (the specification's programs
+<!-- presk's examples/spec/layernorm/layernorm.psk at v0.18.2, unchanged since v0.17.2 (the specification's programs
      moved there, D198), the LayerNorm module, verbatim (comments shortened). -->
 <pre><code>module LayerNorm{D : dim} {
   param γ : ℝ[D]  init = ones     -- gain
@@ -63,8 +63,8 @@ twice. The compiler is written in Rust and generates native code.</p>
 <code>D</code>, checked once for every value of <code>D</code>. It is one of
 the specification's example programs, which the compiler uses as its test
 suite.</p>
-<!-- The output of `presk check layernorm.psk --summary` in examples/spec/layernorm/ at 0.18.0 (the file also
-     holds an RMSNorm module), verbatim, 2026-11-16; the same as at 0.17.1 and 0.17.2. -->
+<!-- The output of `presk check layernorm.psk --summary` in examples/spec/layernorm/ at 0.18.2 (the file also
+     holds an RMSNorm module), verbatim, 2026-11-19; the same as at 0.17.1, 0.17.2 and 0.18.0. -->
 <pre><code>$ presk check layernorm.psk --summary
 layernorm.psk LayerNorm.apply : ℝ[..., model: D]
     let μ : ℝ[...]
@@ -111,7 +111,8 @@ scripts and fonts and loads nothing else. The files it names beside it
 writes them.</p>
 
 <h2 id="status">Where it stands</h2>
-<!-- In step with presk-specs/docs/status-2026-11-14-0.18.0.md (version 0.18.0, tagged 2026-11-16) and the
+<!-- In step with presk-specs/docs/status-2026-11-18-0.18.2.md (version 0.18.2, tagged 2026-11-19), the
+     0.18.0 note it follows (status-2026-11-14-0.18.0.md) and the
      compiler's CHANGELOG; what fails is said to fail. Each number's record is in the comment beside it. -->
 <!-- The funding sentence is the user's (2026-11-12). -->
 <p>Presk is a research project at Mines Paris – PSL, funded by the French
@@ -193,8 +194,27 @@ those that fail are reported as failing:</p>
   8-bit inputs to the matrix products are the cause, not the 16-bit sums.
   On an ordinary processor, with 16- and 24-bit floating-point numbers
   added to the solver's choices, its result for the same model stores
-  10.7&nbsp;% fewer bytes than before and changes no decision. The fast
-  backends do not compute in the new formats yet.</li>
+  10.7&nbsp;% fewer bytes than before and changes no decision.</li>
+  <!-- D215–D220 (0.18.2; status-2026-11-18-0.18.2.md §1, §3 and §5): FC1, every f32 converted to binary16 and
+       e8m15 and back on the native and LLVM backends and in the exported C under four compilers; FC2, the
+       emulator's bits on every executor, but on x86-64 the sign of a NaN an invalid operation generates; the
+       overflow guard (E7007, FC6), +1.22 % in C; FC4 fails, the course GPT's AdamW step in binary16 0.927x
+       all-f32's time on the LLVM backend (12.98 ms against 14.00, D220); FC5 fails, its forward pass 0.857x
+       (731.15 ms against 852.99, D219), the plan's bound 0.85x for both; e8m15's forward pass 2.14x; the 8-bit
+       floats, a nest's other formats and the affine formats still emulated (E7005 on the fast backends). -->
+  <li>Since version 0.18.2 two of these formats run fast on an ordinary
+  processor: binary16, the standard 16-bit floating-point format, and a
+  24-bit format with the range of 32-bit numbers. Their values are stored
+  in their own bits and computed in 32-bit numbers, by both backends and
+  in the C programs the compiler writes, and every result is the
+  emulator's, bit for bit, under every C compiler tried, but for the
+  sign of an invalid result on a second kind of processor; a value that
+  grows past the format's largest number stops the run. On the
+  course-sized GPT they save little time, though: in 16 bits a training
+  update takes 0.93 times its 32-bit time and running the model 0.86
+  times, short of the 0.85 set in advance, and the 24-bit format is
+  slower than 32-bit numbers. The other new formats are still only
+  emulated.</li>
   <li>Work on GPUs has not started, and serving recomputes the whole
   context for every new word.</li>
 </ul>
@@ -207,7 +227,7 @@ those that fail are reported as failing:</p>
 </table>
 
 <h2 id="install">Install</h2>
-<!-- The crate `presk` on crates.io, published from the public repository at 0.18.0 (presk's CONTRIBUTING.md). -->
+<!-- The crate `presk` on crates.io, published from the public repository at 0.18.2 (presk's CONTRIBUTING.md). -->
 <pre><code>cargo install presk
 presk --help</code></pre>
 <p class="note">Building it needs a Rust toolchain (1.85 or later),
@@ -219,7 +239,7 @@ PyTorch export generates.</p>
 <h2 id="source">Source</h2>
 <p>The compiler is published under the Apache License 2.0 at
 <a href="https://github.com/presk-lang/presk">github.com/presk-lang/presk</a>:
-the whole compiler at version 0.18.0, with one commit per version since
+the whole compiler at version 0.18.2, with one commit per version since
 0.1.0. Every program written in Presk is in its <code>examples/</code>:
 the specification's example programs, which serve as its test suite, the
 tutorial's programs, BERT-large and Llama. The scripts behind every
@@ -231,7 +251,7 @@ repository will follow.</p>
 <pre><code>@software{presk2026,
   author  = {{Centre de recherche en informatique, Mines Paris, PSL}},
   title   = {Presk: a compiler for neural networks with exact real semantics},
-  version = {0.18.0},
+  version = {0.18.2},
   year    = {2026},
   url     = {https://github.com/presk-lang/presk},
   license = {Apache-2.0}
